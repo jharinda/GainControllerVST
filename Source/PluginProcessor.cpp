@@ -19,9 +19,12 @@ GainPlugin3AudioProcessor::GainPlugin3AudioProcessor()
                       #endif
                        .withOutput ("Output", juce::AudioChannelSet::stereo(), true)
                      #endif
-                       )
+                       ),gainValue(-5.0f),
+    treeState(*this, nullptr, "PARAMETERS", { std::make_unique<AudioParameterFloat>(GAIN_ID,GAIN_NAME,-48.0f,0.0f,-15.0f) })
 #endif
 {
+    //NormalisableRange<float> gainRange(-48.0f, 0.0f);
+    //treeState.createAndAddParameter(GAIN_ID, GAIN_NAME, gainRange, 0.5f, nullptr, nullptr);
 }
 
 GainPlugin3AudioProcessor::~GainPlugin3AudioProcessor()
@@ -141,11 +144,14 @@ void GainPlugin3AudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, 
 
     for (int channel = 0; channel < totalNumInputChannels; ++channel)
     {
-        auto* channelData = buffer.getWritePointer (channel);
+        auto channelData = buffer.getWritePointer (channel);
+        auto sliderGainValue = treeState.getRawParameterValue(GAIN_ID);
 
         for (int sample = 0; sample < buffer.getNumSamples(); ++sample)
         {
-            channelData[sample] = buffer.getSample(channel, sample) * rawVolume;
+            channelData[sample] = buffer.getSample(channel, sample) * (pow (10,gainValue/20));
+            //channelData[sample] = buffer.getSample(channel, sample) * Decibels::decibelsToGain(*sliderGainValue);
+
         }
     }
 }

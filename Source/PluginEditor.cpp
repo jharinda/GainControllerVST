@@ -17,10 +17,15 @@ GainPlugin3AudioProcessorEditor::GainPlugin3AudioProcessorEditor (GainPlugin3Aud
     // editor's size to whatever you need it to be.
     setSize (200, 400);
 
+    
+
+    sliderValue = std::make_unique< AudioProcessorValueTreeState::SliderAttachment>
+        (audioProcessor.treeState, GAIN_ID, volumeSlider);
+
     volumeSlider.setSliderStyle(Slider::SliderStyle::LinearVertical);
     volumeSlider.setTextBoxStyle(Slider::TextBoxBelow, true, 120, 20);
-    volumeSlider.setRange(0.0, 1.0);
-    volumeSlider.setValue(0.5);
+    volumeSlider.setRange(-48.0f, 0.0f);
+    volumeSlider.setValue(-5.0f);
     volumeSlider.addListener(this);
 
     addAndMakeVisible(volumeSlider);
@@ -46,6 +51,6 @@ void GainPlugin3AudioProcessorEditor::sliderValueChanged(Slider* slider)
 {
     if(slider == &volumeSlider)
     {
-        audioProcessor.rawVolume = volumeSlider.getValue();
+        audioProcessor.gainValue = volumeSlider.getValue();
     }
 }
