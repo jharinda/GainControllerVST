@@ -19,12 +19,11 @@ GainPlugin3AudioProcessor::GainPlugin3AudioProcessor()
 #endif
         .withOutput("Output", juce::AudioChannelSet::stereo(), true)
 #endif
-    ), gainValue(-5.0f),
+    ), //gainValue(-5.0f),
     treeState(*this, nullptr, "PARAMETERS", createParameterLayout())
 #endif
 {
-    //NormalisableRange<float> gainRange(-48.0f, 0.0f);
-    //treeState.createAndAddParameter(GAIN_ID, GAIN_NAME, gainRange, 0.5f, nullptr, nullptr);
+    //treeState.state = ValueTree("savedParams");
 }
 
 GainPlugin3AudioProcessor::~GainPlugin3AudioProcessor()
@@ -187,13 +186,31 @@ void GainPlugin3AudioProcessor::getStateInformation (juce::MemoryBlock& destData
     // You should use this method to store your parameters in the memory block.
     // You could do that either as raw data, or use the XML or ValueTree classes
     // as intermediaries to make it easy to save and load complex data.
+
+    //ScopedPointer <XmlElement> xml (treeState.state.createXml());
+
+    auto state = treeState.copyState();
+    std::unique_ptr<juce::XmlElement> xml(state.createXml());
+    copyXmlToBinary(*xml, destData);
+
 }
 
-void GainPlugin3AudioProcessor::setStateInformation (const void* data, int sizeInBytes)
+void GainPlugin3AudioProcessor::setStateInformation(const void* data, int sizeInBytes)
 {
     // You should use this method to restore your parameters from this memory block,
     // whose contents will have been created by the getStateInformation() call.
+
+    std::unique_ptr<juce::XmlElement> xmlState(getXmlFromBinary(data, sizeInBytes));
+
+    if (xmlState != nullptr)
+    {
+        if (xmlState->hasTagName(treeState.state.getType()))
+        {
+            treeState.state = juce::ValueTree::fromXml(*xmlState);
+        }
+    }
 }
+    
 
 //==============================================================================
 // This creates new instances of the plugin..

@@ -25,7 +25,7 @@ GainPlugin3AudioProcessorEditor::GainPlugin3AudioProcessorEditor (GainPlugin3Aud
     volumeSlider.setSliderStyle(Slider::SliderStyle::LinearVertical);
     volumeSlider.setTextBoxStyle(Slider::TextBoxBelow, true, 120, 20);
     volumeSlider.setRange(-48.0f, 0.0f);
-    volumeSlider.setValue(-5.0f);
+    //volumeSlider.setValue(-5.0f);
     volumeSlider.addListener(this);
 
     addAndMakeVisible(volumeSlider);
