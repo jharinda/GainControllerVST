@@ -12,15 +12,15 @@
 //==============================================================================
 GainPlugin3AudioProcessor::GainPlugin3AudioProcessor()
 #ifndef JucePlugin_PreferredChannelConfigurations
-     : AudioProcessor (BusesProperties()
-                     #if ! JucePlugin_IsMidiEffect
-                      #if ! JucePlugin_IsSynth
-                       .withInput  ("Input",  juce::AudioChannelSet::stereo(), true)
-                      #endif
-                       .withOutput ("Output", juce::AudioChannelSet::stereo(), true)
-                     #endif
-                       ),gainValue(-5.0f),
-    treeState(*this, nullptr, "PARAMETERS", { std::make_unique<AudioParameterFloat>(GAIN_ID,GAIN_NAME,-48.0f,0.0f,-15.0f) })
+    : AudioProcessor(BusesProperties()
+#if ! JucePlugin_IsMidiEffect
+#if ! JucePlugin_IsSynth
+        .withInput("Input", juce::AudioChannelSet::stereo(), true)
+#endif
+        .withOutput("Output", juce::AudioChannelSet::stereo(), true)
+#endif
+    ), gainValue(-5.0f),
+    treeState(*this, nullptr, "PARAMETERS", createParameterLayout())
 #endif
 {
     //NormalisableRange<float> gainRange(-48.0f, 0.0f);
@@ -31,7 +31,21 @@ GainPlugin3AudioProcessor::~GainPlugin3AudioProcessor()
 {
 }
 
+
 //==============================================================================
+//Parameter Layout
+AudioProcessorValueTreeState::ParameterLayout GainPlugin3AudioProcessor::createParameterLayout()
+{
+    std::vector <std::unique_ptr <RangedAudioParameter >> params;
+
+    auto gainParam = std::make_unique<AudioParameterFloat>(GAIN_ID, GAIN_NAME, -48.0f, 0.0f, -15.0f);
+
+    params.push_back(std::move(gainParam));
+
+    return { params.begin(), params.end() };
+
+}
+
 const juce::String GainPlugin3AudioProcessor::getName() const
 {
     return JucePlugin_Name;

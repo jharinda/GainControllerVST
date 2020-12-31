@@ -57,6 +57,8 @@ public:
     double gainValue;
     juce::AudioProcessorValueTreeState treeState;
 
+    juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
+
 private:
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GainPlugin3AudioProcessor)
