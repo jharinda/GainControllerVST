@@ -58,6 +58,7 @@ public:
     juce::AudioProcessorValueTreeState treeState;
 
     juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
+    float previousGain;
 
 private:
     //==============================================================================

@@ -111,6 +111,8 @@ void GainPlugin3AudioProcessor::prepareToPlay (double sampleRate, int samplesPer
 {
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
+    previousGain = pow(10, *treeState.getRawParameterValue(GAIN_ID)/20);
+    //previousGain = juce::Decibels::decibelsToGain(treeState.getRawParameterValue(GAIN_ID));
 }
 
 void GainPlugin3AudioProcessor::releaseResources()
@@ -149,24 +151,21 @@ void GainPlugin3AudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, 
     auto totalNumInputChannels  = getTotalNumInputChannels();
     auto totalNumOutputChannels = getTotalNumOutputChannels();
 
+    float currentGain = pow(10, *treeState.getRawParameterValue(GAIN_ID)/20);
+
     
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear (i, 0, buffer.getNumSamples());
 
-        
 
-    for (int channel = 0; channel < totalNumInputChannels; ++channel)
-    {
-        auto channelData = buffer.getWritePointer (channel);
-        auto sliderGainValue = treeState.getRawParameterValue(GAIN_ID);
-
-        for (int sample = 0; sample < buffer.getNumSamples(); ++sample)
-        {
-            channelData[sample] = buffer.getSample(channel, sample) * (pow (10,gainValue/20));
-            //channelData[sample] = buffer.getSample(channel, sample) * Decibels::decibelsToGain(*sliderGainValue);
-
-        }
+    if (currentGain == previousGain) {
+        buffer.applyGain(currentGain);
     }
+    else {
+        buffer.applyGainRamp(0, buffer.getNumSamples(), previousGain, currentGain);
+        previousGain = currentGain;
+    }
+        
 }
 
 //==============================================================================
